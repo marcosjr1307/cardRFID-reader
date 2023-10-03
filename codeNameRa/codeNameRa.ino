@@ -61,6 +61,7 @@ void loop()
     String temp;
     String conteudoLido; //DELCALRAR POS AQUI
     pos = 0;
+    Serial.println("Verificando...");
     while (dados.available()) {
       val.concat(char(dados.read()));
       for (int i = 0; i < val.length(); i++) {
@@ -72,12 +73,9 @@ void loop()
           n2 = conteudoLido.length();
           pos += n2 + 35;
           dados.seek(pos);
-          Serial.println("TAG Registrada: " + conteudoLido + " TAG Solicitada: " + conteudo);
           if (conteudoLido == nomePalestra) {
             cont3++;
             delay(10);
-            Serial.print("cont3:");
-            Serial.println(cont3);
           }
           if (conteudoLido == conteudo) {
             pos = 0;
@@ -159,6 +157,7 @@ void loop()
         String temp;
         String conteudoLido; //DELCALRAR POS AQUI
         pos1 = 0;
+        Serial.println("Verificando...");
         while (dados.available()) {
           val.concat(char(dados.read()));
           for (int i = 0; i < val.length(); i++) {
@@ -170,7 +169,6 @@ void loop()
               n2 = conteudoLido.length();
               pos1 += n2 + 35;
               dados.seek(pos1);
-              Serial.println("TAG Registrada: " + conteudoLido + " TAG Solicitada: " + conteudo);
               if (conteudoLido == conteudo) {
                 cont4++;
                 if (cont4 == 2) {
