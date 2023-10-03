@@ -23,10 +23,13 @@ void setup()
   Serial.println("Aproxime a sua tag...");
   Serial.println();
 }
-
+int pos1=0;
 int pos = 0;
 int cont = 0;
+int cont3 = 0;
+int cont4 = 0;
 String teste;
+String nomePalestra = " Palestra2  ";
 void loop()
 {
   //Procura nova tag
@@ -52,7 +55,7 @@ void loop()
   }
 
   Serial.println(conteudo);
-  dados = SD.open("registros321.txt");
+  dados = SD.open("registro.txt");
   if (dados) {
     String val;
     String temp;
@@ -70,6 +73,12 @@ void loop()
           pos += n2 + 35;
           dados.seek(pos);
           Serial.println("TAG Registrada: " + conteudoLido + " TAG Solicitada: " + conteudo);
+          if (conteudoLido == nomePalestra) {
+            cont3++;
+            delay(10);
+            Serial.print("cont3:");
+            Serial.println(cont3);
+          }
           if (conteudoLido == conteudo) {
             pos = 0;
             cont++;
@@ -91,8 +100,9 @@ void loop()
 
   delay(1000);
   if (cont == 0) {
+    cont3 = 0;
     delay(10);
-    dados = SD.open("registros321.txt", FILE_WRITE);
+    dados = SD.open("registro.txt", FILE_WRITE);
     String nomeSala;
     String nome;
     String sala;
@@ -134,11 +144,85 @@ void loop()
     Serial.println("Done!\n--------------------");
     delay(50);
     Serial.println("\nAproxime o cartão!");
-  }
+  } //fim se não estiver cadastrado
 
-  if (cont == 1) {
-    Serial.println("RA JÁ GRAVADO!\n--------------------");
+
+
+  if (cont == 1) { //está cadastrado já
     cont = 0;
+    if (cont3 == 0) { //o cara está cadastrado em um antiga, não precisa do nome somente do do seo codigo hex
+      Serial.println("Somente iremos usar seu codigo hexadecimal, não necessita de nome!");
+
+      dados = SD.open("registro.txt");
+      if (dados) {
+        String val;
+        String temp;
+        String conteudoLido; //DELCALRAR POS AQUI
+        pos1 = 0;
+        while (dados.available()) {
+          val.concat(char(dados.read()));
+          for (int i = 0; i < val.length(); i++) {
+            String temp = val.substring(i, i + 1);
+            if (temp.equalsIgnoreCase(";")) {
+              conteudoLido = val.substring(0, i);
+              val = "";
+              int n2;
+              n2 = conteudoLido.length();
+              pos1 += n2 + 35;
+              dados.seek(pos1);
+              Serial.println("TAG Registrada: " + conteudoLido + " TAG Solicitada: " + conteudo);
+              if (conteudoLido == conteudo) {
+                cont4++;
+                if (cont4 == 2) {
+                  pos1 = 0;
+                  break;
+                }
+              }
+            }
+          }
+          if (cont4 == 2) {
+            break;
+          }
+        }
+        dados.close();
+      }
+      else {
+        Serial.println("Problema na conexão!");
+        dados.close();
+      }
+
+      if (cont4 == 1) { //só está cadastrado na base, precisa cadastrar na palestra atual
+        dados = SD.open("registro.txt", FILE_WRITE);
+        if (dados) {
+          int n1 = conteudo.length();
+          String temp;
+          for (int i = 0 ; i < 31; i++ ) {
+            temp.concat(" ");
+          }
+          temp.concat(".");
+          dados.print(conteudo);
+          dados.print(";");
+          dados.println(temp);
+          dados.close();
+          delay(50);
+          Serial.println("Presente na palestra atual");
+        }
+        else {
+          Serial.println("Conexão falhou");
+          dados.close();
+        }
+      }
+
+      if (cont4 == 2) {
+        Serial.println("Aluno já cadastrado na palestra atual!");
+      }
+      cont4 = 0;
+    }
+
+    if (cont3 == 1) { //o cara está cadastrado na nova, então não precis mais;
+        Serial.println("Aluno já cadastrado na palestra atual!");
+    }
+    cont3 = 0;
     Serial.println("\nAproxime o cartão!");
   }
 }
