@@ -29,7 +29,7 @@ int cont = 0;
 int cont3 = 0;
 int cont4 = 0;
 String teste;
-String nomePalestra = " Palestra2  ";
+String nomePalestra = " Palestra3  ";
 void loop()
 {
   //Procura nova tag
